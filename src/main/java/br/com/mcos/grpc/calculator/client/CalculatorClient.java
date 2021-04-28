@@ -1,8 +1,9 @@
 package br.com.mcos.grpc.calculator.client;
 
-import br.com.mcos.proto.calculator.CalculatorServiceGrpc;
-import br.com.mcos.proto.calculator.SumRequest;
-import br.com.mcos.proto.calculator.SumResponse;
+import br.com.mcos.calculator.CalculatorServiceGrpc;
+import br.com.mcos.calculator.PrimeNumberDecompositionRequest;
+import br.com.mcos.calculator.SumRequest;
+import br.com.mcos.calculator.SumResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -14,13 +15,26 @@ public class CalculatorClient {
 
         CalculatorServiceGrpc.CalculatorServiceBlockingStub stub = CalculatorServiceGrpc.newBlockingStub(channel);
 
-        SumRequest request = SumRequest.newBuilder()
-                .setFirstNumber(10)
-                .setSecondNumber(25)
-                .build();
+//        Unary
+//        SumRequest request = SumRequest.newBuilder()
+//                .setFirstNumber(10)
+//                .setSecondNumber(25)
+//                .build();
+//
+//        SumResponse response = stub.sum(request);
+//
+//        System.out.println(request.getFirstNumber() + " + " + request.getSecondNumber() + " = " + response.getSumResult());
 
-        SumResponse response = stub.sum(request);
 
-        System.out.println(request.getFirstNumber() + " + " + request.getSecondNumber() + " = " + response.getSumResult());
+//        Streaming Server
+
+        Integer number = 567890;
+        stub.primeNumberDecomposition(PrimeNumberDecompositionRequest.newBuilder()
+                .setNumber(number)
+                .build())
+                .forEachRemaining(primeNumberDecompositionResponse -> {
+                    System.out.println(primeNumberDecompositionResponse.getPrimeFactor());
+                });
+        channel.shutdown();
     }
 }
