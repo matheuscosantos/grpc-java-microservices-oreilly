@@ -9,24 +9,38 @@ import io.grpc.ManagedChannelBuilder;
 
 public class CalculatorClient {
     public static void main(String[] args) {
+        System.out.println("Hello I'm a gRPC client");
+
+        CalculatorClient main = new CalculatorClient();
+        main.run();
+    }
+
+    private void run() {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50052)
                 .usePlaintext()
                 .build();
 
+//        doUnaryCall(channel);
+//        doServerStreamingCall(channel);
+
+        channel.shutdown();
+    }
+
+    private void doUnaryCall(ManagedChannel channel) {
         CalculatorServiceGrpc.CalculatorServiceBlockingStub stub = CalculatorServiceGrpc.newBlockingStub(channel);
 
-//        Unary
-//        SumRequest request = SumRequest.newBuilder()
-//                .setFirstNumber(10)
-//                .setSecondNumber(25)
-//                .build();
-//
-//        SumResponse response = stub.sum(request);
-//
-//        System.out.println(request.getFirstNumber() + " + " + request.getSecondNumber() + " = " + response.getSumResult());
+        SumRequest request = SumRequest.newBuilder()
+                .setFirstNumber(10)
+                .setSecondNumber(25)
+                .build();
 
+        SumResponse response = stub.sum(request);
 
-//        Streaming Server
+        System.out.println(request.getFirstNumber() + " + " + request.getSecondNumber() + " = " + response.getSumResult());
+    }
+
+    private void doServerStreamingCall(ManagedChannel channel) {
+        CalculatorServiceGrpc.CalculatorServiceBlockingStub stub = CalculatorServiceGrpc.newBlockingStub(channel);
 
         Integer number = 567890;
         stub.primeNumberDecomposition(PrimeNumberDecompositionRequest.newBuilder()
@@ -35,6 +49,5 @@ public class CalculatorClient {
                 .forEachRemaining(primeNumberDecompositionResponse -> {
                     System.out.println(primeNumberDecompositionResponse.getPrimeFactor());
                 });
-        channel.shutdown();
     }
 }
