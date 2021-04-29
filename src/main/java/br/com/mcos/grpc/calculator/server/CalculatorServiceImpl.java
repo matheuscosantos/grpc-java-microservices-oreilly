@@ -1,6 +1,7 @@
 package br.com.mcos.grpc.calculator.server;
 
 import br.com.mcos.calculator.*;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServiceImplBase {
@@ -103,5 +104,25 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
                 responseObserver.onCompleted();
             }
         };
+    }
+
+    @Override
+    public void squareRoot(SquareRootRequest request, StreamObserver<SquareRootResponse> responseObserver) {
+        // Extract information from Request as it is received.
+        int inputNumber = request.getNumber();
+
+        if(inputNumber > 0) {
+            // Send back the response
+            double squareRootNumber = Math.sqrt(inputNumber);
+            responseObserver.onNext(SquareRootResponse.newBuilder()
+                    .setNumberRoot(squareRootNumber).build());
+        } else {
+            // Send back the response not possible.
+            responseObserver
+                    .onError(Status.INVALID_ARGUMENT.withDescription("Number is Not positive.").asRuntimeException());
+        }
+        // complete the call
+        responseObserver.onCompleted();
+
     }
 }
